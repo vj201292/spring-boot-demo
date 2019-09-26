@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository("fakedao")
@@ -14,12 +15,34 @@ public class FakePersonDataAccessService implements PersonDao {
 
     @Override
     public int insertPerson(UUID id, Person person) {
-        DB.add(new Person(id,person.getName()));
+        DB.add(new Person(id, person.getName()));
         return 1;
     }
 
     @Override
     public List<Person> selectALlPeople() {
         return DB;
+    }
+
+    @Override
+    public int updatePersonById(UUID id, Person person) {
+        return 0;
+    }
+
+    @Override
+    public int deleteById(UUID id) {
+        Optional<Person> personMayBe = selectPersonById(id);
+        if (!personMayBe.isPresent()) {
+            return 0;
+        }
+        DB.remove(personMayBe.get());
+        return 1;
+    }
+
+    @Override
+    public Optional<Person> selectPersonById(UUID id) {
+        return DB.stream()
+                .filter(person -> person.getId().equals(id))
+                .findFirst();
     }
 }
